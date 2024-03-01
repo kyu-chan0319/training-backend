@@ -50,7 +50,7 @@ const server = http.createServer((request, response) => {
     // リクエストが来るたびにカウンターを1増やす
     counter += 1;
   }
-  // カウンターの値を表示し、レスポンスを返す
+  // カウンターの値を表示しレスポンスを返す
   response.end(`This page has been accessed ${counter} times.`);
 });
 
