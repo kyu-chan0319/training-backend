@@ -44,15 +44,38 @@ const port = 3000;
 // カウンターの初期値を設定
 let counter = 0;
 
+// ↓ サーバーアクセス時にカウンターを増やす処理
+// const server = http.createServer((request, response) => {
+//   // ルートパスの場合のみカウンターを適用
+//   if (request.url === "/") {
+//     // リクエストが来るたびにカウンターを1増やす
+//     counter += 1;
+//   }
+//   // カウンターの値を表示しレスポンスを返す
+//   response.end(`This page has been accessed ${counter} times.`);
+// });
+
+// ↓ /get/booksアクセス時に本データを取得する
 const server = http.createServer((request, response) => {
-  // ルートパスの場合のみカウンターを適用
-  if (request.url === "/") {
-    // リクエストが来るたびにカウンターを1増やす
-    counter += 1;
+  if (request.method === "GET" && request.url === "/get/books") {
+    getBookData(response);
+  } else {
+    response.writeHead(404);
+    response.end("Not Found");
   }
-  // カウンターの値を表示しレスポンスを返す
-  response.end(`This page has been accessed ${counter} times.`);
 });
+
+// 本データ
+const data = { books: [{ title: "人間失格" }] };
+
+const getBookData = (response: http.ServerResponse) => {
+  console.log("Book Data", data);
+  // レスポンスヘッダーを設定
+  // レスポンスヘッダーには、ステータスコード(200)とコンテンツタイプ(json)を設定
+  response.writeHead(200, { "Content-Type": "application/json" });
+  // response bodyには、本データを設定
+  response.end(JSON.stringify(data));
+};
 
 server.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
