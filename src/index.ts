@@ -54,29 +54,3 @@ let counter = 0;
 //   // カウンターの値を表示しレスポンスを返す
 //   response.end(`This page has been accessed ${counter} times.`);
 // });
-
-// /get/booksアクセス時に本データを取得する
-const server = http.createServer((request, response) => {
-  if (request.method === "GET" && request.url === "/get/books") {
-    getBookData(response);
-  } else {
-    response.writeHead(404);
-    response.end("Not Found");
-  }
-});
-
-// 本データ
-const data = { books: [{ title: "人間失格" }] };
-
-const getBookData = (response: http.ServerResponse) => {
-  console.log("Book Data", data);
-  // レスポンスヘッダーを設定
-  // レスポンスヘッダーには、ステータスコード(200)とコンテンツタイプ(json)を設定
-  response.writeHead(200, { "Content-Type": "application/json" });
-  // response bodyには、本データを設定
-  response.end(JSON.stringify(data));
-};
-
-server.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
