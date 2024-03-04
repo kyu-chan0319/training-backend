@@ -55,7 +55,7 @@ let counter = 0;
 //   response.end(`This page has been accessed ${counter} times.`);
 // });
 
-// ↓ /get/booksアクセス時に本データを取得する
+// /get/booksアクセス時に本データを取得する
 const server = http.createServer((request, response) => {
   if (request.method === "GET" && request.url === "/get/books") {
     getBookData(response);
