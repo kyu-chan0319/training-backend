@@ -1,33 +1,18 @@
 import * as http from "http";
-import { readFileSync } from "fs";
+
 const port = 3000;
 
 const server = http.createServer((request, response) => {
   if (request.method === "GET" && request.url === "/books") {
     getBookData(response);
-  } else if (request.method === "POST" && request.url === "/register") {
-    // /registerにアクセスした時の処理を追加
-    serveIndexHtml(response);
+  } else if (request.method === "POST" && request.url === "/borrow") {
+    borrowBook(response);
   } else {
     response.writeHead(404);
     response.end("Not Found");
   }
 });
 
-// index.htmlを読み込む
-const serveIndexHtml = (res: http.ServerResponse) => {
-  try {
-    const indexPath = "./index.html";
-    const indexContent = readFileSync(indexPath, "utf8");
-    res.writeHead(200, { "Content-Type": "text/html" });
-    res.end(indexContent);
-  } catch (error) {
-    res.writeHead(500);
-    res.end("Internal Server Error");
-  }
-};
-
-// 本データの型定義
 interface Book {
   title: string;
   borrower: string | null;
@@ -36,6 +21,7 @@ interface Book {
 // 本データ
 const data: Book = { title: "人間失格", borrower: null };
 
+// 本データを取得するAPI (GET path: /books)
 const getBookData = (response: http.ServerResponse) => {
   console.log("Book Data", data);
   // レスポンスヘッダーを設定
@@ -45,12 +31,9 @@ const getBookData = (response: http.ServerResponse) => {
   response.end(JSON.stringify(data));
 };
 
+// 本を借りるAPI (POST path: /borrow)
 const borrowBook = (response: http.ServerResponse) => {
   data.borrower = "kyu-chan";
-
-  // POST実行後のデータをログに出力
-  console.log("Updated Book Data", data);
-
   response.writeHead(200, { "Content-Type": "application/json" });
   response.end(JSON.stringify(data));
 };
