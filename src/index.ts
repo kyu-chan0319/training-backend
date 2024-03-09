@@ -1,73 +1,38 @@
-/** Hono ライブラリを使用したサーバーの立ち上げ */
-// import { serve } from "@hono/node-server";
-// import { Hono } from "hono";
-
-// const app = new Hono();
-
-// app.get("/", (c) => {
-//   return c.text("Hello World!");
-// });
-
-// app.get("/hello-world", (c) => {
-//   return c.text("Hello World!");
-// });
-
-// const port = 3000;
-// console.log(`Server is running on port ${port}`);
-
-// serve({
-//   fetch: app.fetch,
-//   port,
-// });
-
-/** Node.js http を使用したサーバーの立ち上げ */
-// import * as http from "http";
-
-// const express = require("express");
-// const app = express();
-// const port = 3000;
-
-// const server = http.createServer((request, response) => {
-//   response.end("Hello World!");
-// });
-
-// // server.listen(port);
-// server.listen(port, () => {
-//   console.log(`Server is running on http://localhost:${port}`);
-// });
-
-/** サーバーにアクセスする度にcounterの値が+1される */
 import * as http from "http";
 
 const port = 3000;
 
-// カウンターの初期値を設定
-let counter = 0;
-
-// ↓ サーバーアクセス時にカウンターを増やす処理
-// const server = http.createServer((request, response) => {
-//   // ルートパスの場合のみカウンターを適用
-//   if (request.url === "/") {
-//     // リクエストが来るたびにカウンターを1増やす
-//     counter += 1;
-//   }
-//   // カウンターの値を表示しレスポンスを返す
-//   response.end(`This page has been accessed ${counter} times.`);
-// });
-
-// ↓ /get/booksアクセス時に本データを取得する
 const server = http.createServer((request, response) => {
-  if (request.method === "GET" && request.url === "/get/books") {
+  if (request.method === "GET" && request.url === "/books") {
     getBookData(response);
+  } else if (request.method === "POST" && request.url === "/borrow") {
+    borrowBook(response);
+  } else if (request.method === "POST" && request.url === "/register") {
+    registerBook(response);
+  } else if (request.method === "GET" && request.url === "/history") {
+    getHistoryBookData(response);
   } else {
     response.writeHead(404);
     response.end("Not Found");
   }
 });
 
-// 本データ
-const data = { books: [{ title: "人間失格" }] };
+interface Book {
+  title: string;
+  borrower: string | null;
+}
 
+// 本データ
+const data: Book = { title: "人間失格", borrower: null };
+
+// 貸出履歴データ
+const history: Book[] = [
+  { title: "人間失格", borrower: "kyu-chan" },
+  { title: "ノルウェイの森", borrower: "kyu-chan" },
+  { title: "羅生門", borrower: "kyu-chan" },
+];
+
+// 本データを取得するAPI (GET path: /books)
 const getBookData = (response: http.ServerResponse) => {
   console.log("Book Data", data);
   // レスポンスヘッダーを設定
@@ -75,6 +40,27 @@ const getBookData = (response: http.ServerResponse) => {
   response.writeHead(200, { "Content-Type": "application/json" });
   // response bodyには、本データを設定
   response.end(JSON.stringify(data));
+};
+
+// 本を借りるAPI (POST path: /borrow)
+const borrowBook = (response: http.ServerResponse) => {
+  data.borrower = "kyu-chan";
+  response.writeHead(200, { "Content-Type": "application/json" });
+  response.end(JSON.stringify(data));
+};
+
+// 本を登録するAPI (POST path: /register)
+const registerBook = (response: http.ServerResponse) => {
+  data.title = "人間失格2";
+  response.writeHead(200, { "Content-Type": "application/json" });
+  response.end(JSON.stringify(data));
+};
+
+// 貸出履歴データを取得するAPI (GET path: /history)
+const getHistoryBookData = (response: http.ServerResponse) => {
+  console.log("History Book Data", history);
+  response.writeHead(200, { "Content-Type": "application/json" });
+  response.end(JSON.stringify(history));
 };
 
 server.listen(port, () => {
